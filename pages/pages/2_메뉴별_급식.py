@@ -7,7 +7,7 @@ import streamlit as st
 
 
 # =========================================================
-# 기본 설정
+# PAGE
 # =========================================================
 
 st.set_page_config(
@@ -20,28 +20,169 @@ st.set_page_config(
 NEIS_URL = "https://open.neis.go.kr/hub"
 
 OFFICE_CODE = "J10"
-
 SCHOOL_CODE = "7530480"
-
 SCHOOL_NAME = "송탄고등학교"
 
 
 # =========================================================
-# 제목
+# DESIGN
 # =========================================================
 
-st.title(
-    "🍽️ 메뉴별 급식 분석"
-)
+st.markdown(
+    """
+    <style>
 
-st.write(
-    "2025년 9월부터 2026년 9월까지 "
-    "급식 메뉴가 얼마나 자주 등장했는지 분석합니다."
+    .stApp {
+        background:
+            linear-gradient(
+                180deg,
+                #F8FAFC,
+                #F1F5F9
+            );
+
+        color: #0F172A;
+    }
+
+    .main .block-container {
+        max-width: 1200px;
+
+        padding-top: 2.5rem;
+
+        padding-bottom: 4rem;
+    }
+
+    h1, h2, h3 {
+        color: #0F172A !important;
+    }
+
+    .hero {
+        background:
+            linear-gradient(
+                135deg,
+                #FFFFFF,
+                #F0FDF4
+            );
+
+        border: 1px solid #DCFCE7;
+
+        border-radius: 24px;
+
+        padding: 32px 36px;
+
+        margin-bottom: 28px;
+
+        box-shadow:
+            0 10px 30px
+            rgba(15, 23, 42, 0.06);
+    }
+
+    .badge {
+        display: inline-block;
+
+        background: #DCFCE7;
+
+        color: #15803D !important;
+
+        padding: 7px 12px;
+
+        border-radius: 999px;
+
+        font-size: 13px;
+
+        font-weight: 700;
+
+        margin-bottom: 12px;
+    }
+
+    .title {
+        font-size: 36px;
+
+        font-weight: 800;
+
+        color: #0F172A !important;
+    }
+
+    .subtitle {
+        color: #64748B !important;
+
+        font-size: 16px;
+
+        line-height: 1.7;
+
+        margin-top: 8px;
+    }
+
+    .stat-card {
+        background: #FFFFFF;
+
+        border: 1px solid #E2E8F0;
+
+        border-radius: 18px;
+
+        padding: 22px;
+
+        min-height: 120px;
+
+        box-shadow:
+            0 6px 18px
+            rgba(15, 23, 42, 0.05);
+    }
+
+    .stat-label {
+        color: #64748B !important;
+
+        font-size: 13px;
+
+        font-weight: 700;
+
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        color: #0F172A !important;
+
+        font-size: 24px;
+
+        font-weight: 800;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
 
 # =========================================================
-# API Key 확인
+# HERO
+# =========================================================
+
+st.markdown(
+    f"""
+    <div class="hero">
+
+        <div class="badge">
+            MENU ANALYTICS
+        </div>
+
+        <div class="title">
+            🍽️ 메뉴별 급식 분석
+        </div>
+
+        <div class="subtitle">
+            {SCHOOL_NAME}의 급식 데이터를 분석하여
+            어떤 메뉴가 자주 등장하는지 확인합니다.
+            <br>
+            분석 기간 · 2025.09 ~ 2026.09
+        </div>
+
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# =========================================================
+# API KEY
 # =========================================================
 
 try:
@@ -57,15 +198,20 @@ except Exception:
     )
 
     st.info(
-        "Streamlit Cloud의 Settings → Secrets에서 "
-        "NEIS_API_KEY를 등록해주세요."
+        """
+        Streamlit Cloud에서
+
+        Settings → Secrets
+
+        로 이동한 후 NEIS_API_KEY를 등록해주세요.
+        """
     )
 
     st.stop()
 
 
 # =========================================================
-# 급식 전체 데이터 가져오기
+# GET ALL DATA
 # =========================================================
 
 @st.cache_data(ttl=3600)
@@ -133,7 +279,9 @@ def get_all_meals():
             break
 
 
-        all_rows.extend(rows)
+        all_rows.extend(
+            rows
+        )
 
 
         if len(rows) < page_size:
@@ -143,7 +291,6 @@ def get_all_meals():
         page_index += 1
 
 
-        # 안전장치
         if page_index > 100:
             break
 
@@ -154,7 +301,7 @@ def get_all_meals():
 
 
 # =========================================================
-# 데이터 가져오기
+# DATA
 # =========================================================
 
 df = get_all_meals()
@@ -170,7 +317,7 @@ if df.empty:
 
 
 # =========================================================
-# 메뉴별 등장 날짜 계산
+# COUNT MENU
 # =========================================================
 
 menu_days = {}
@@ -196,7 +343,6 @@ for _, row in df.iterrows():
         continue
 
 
-    # <br/> 기준으로 메뉴 분리
     menus = menu_text.split(
         "<br/>"
     )
@@ -204,7 +350,6 @@ for _, row in df.iterrows():
 
     for menu in menus:
 
-        # 알레르기 번호 제거
         menu = re.sub(
             r"\([^)]*\)",
             "",
@@ -224,14 +369,13 @@ for _, row in df.iterrows():
             menu_days[menu] = set()
 
 
-        # 같은 날짜에는 한 번만 계산
         menu_days[menu].add(
             date
         )
 
 
 # =========================================================
-# 분석 결과
+# RESULT
 # =========================================================
 
 result = pd.DataFrame(
@@ -240,6 +384,7 @@ result = pd.DataFrame(
             "메뉴": menu,
             "등장일수": len(days),
         }
+
         for menu, days
         in menu_days.items()
     ]
@@ -255,7 +400,7 @@ result = result.sort_values(
 
 
 # =========================================================
-# TOP N 선택
+# TOP N
 # =========================================================
 
 top_n = st.slider(
@@ -272,7 +417,7 @@ top_df = result.head(
 
 
 # =========================================================
-# 주요 지표
+# STATISTICS
 # =========================================================
 
 total_days = df[
@@ -308,57 +453,125 @@ if total_days > 0:
     )
 
 
-col1, col2, col3 = st.columns(3)
+c1, c2, c3 = st.columns(3)
 
 
-with col1:
+with c1:
 
-    st.metric(
-        "급식 일수",
-        total_days,
+    st.markdown(
+        f"""
+        <div class="stat-card">
+
+            <div class="stat-label">
+                MEAL DAYS
+            </div>
+
+            <div class="stat-value">
+                {total_days}
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
 
-with col2:
+with c2:
 
-    st.metric(
-        "가장 많이 나온 메뉴",
-        first_menu,
+    st.markdown(
+        f"""
+        <div class="stat-card">
+
+            <div class="stat-label">
+                #1 MENU
+            </div>
+
+            <div class="stat-value">
+                {first_menu}
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
 
-with col3:
+with c3:
 
-    st.metric(
-        "등장 비율",
-        f"{percentage:.1f}%",
+    st.markdown(
+        f"""
+        <div class="stat-card">
+
+            <div class="stat-label">
+                APPEARANCE RATE
+            </div>
+
+            <div class="stat-value">
+                {percentage:.1f}%
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
 
 # =========================================================
-# 그래프
+# CHART
 # =========================================================
 
-st.subheader(
-    f"📊 메뉴 TOP {top_n}"
+st.markdown(
+    "## 📊 메뉴 TOP 순위"
+)
+
+
+chart_df = top_df.sort_values(
+    "등장일수"
 )
 
 
 fig = px.bar(
-    top_df.sort_values(
-        "등장일수"
-    ),
+    chart_df,
     x="등장일수",
     y="메뉴",
     orientation="h",
     text="등장일수",
-    title=f"{SCHOOL_NAME} 메뉴별 등장 일수",
+)
+
+
+fig.update_traces(
+    marker_color="#16A34A",
+    textposition="outside",
 )
 
 
 fig.update_layout(
-    xaxis_title="등장 일수",
-    yaxis_title="메뉴",
+    plot_bgcolor="rgba(0,0,0,0)",
+    paper_bgcolor="rgba(0,0,0,0)",
+
+    font=dict(
+        color="#0F172A"
+    ),
+
+    xaxis=dict(
+        title="등장 일수",
+        gridcolor="#E2E8F0",
+        zeroline=False,
+    ),
+
+    yaxis=dict(
+        title="",
+        automargin=True,
+    ),
+
+    margin=dict(
+        l=20,
+        r=40,
+        t=20,
+        b=20,
+    ),
+
+    height=600,
 )
 
 
@@ -369,22 +582,23 @@ st.plotly_chart(
 
 
 # =========================================================
-# 표
+# TABLE
 # =========================================================
 
-st.subheader(
-    "📋 메뉴별 등장 횟수"
+st.markdown(
+    "## 📋 메뉴별 등장 횟수"
 )
 
 
 st.dataframe(
     top_df,
     use_container_width=True,
+    hide_index=True,
 )
 
 
 # =========================================================
-# 전체 데이터
+# ALL DATA
 # =========================================================
 
 with st.expander(
@@ -394,4 +608,5 @@ with st.expander(
     st.dataframe(
         result,
         use_container_width=True,
+        hide_index=True,
     )
