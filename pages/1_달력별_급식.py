@@ -6,10 +6,6 @@ import requests
 import streamlit as st
 
 
-# =========================================================
-# PAGE
-# =========================================================
-
 st.set_page_config(
     page_title="달력별 급식",
     page_icon="📅",
@@ -33,134 +29,93 @@ st.markdown(
     <style>
 
     .stApp {
-        background:
-            linear-gradient(
-                180deg,
-                #F8FAFC,
-                #F1F5F9
-            );
-        color: #0F172A;
+        background: #F1E8D5;
     }
 
     .main .block-container {
         max-width: 1200px;
-        padding-top: 2.5rem;
-        padding-bottom: 4rem;
+        padding-top: 42px;
+        padding-bottom: 60px;
     }
 
-    h1, h2, h3 {
-        color: #0F172A !important;
+    .main h1,
+    .main h2,
+    .main h3,
+    .main p,
+    .main label {
+        color: #17202A !important;
     }
 
     .hero {
-        background:
-            linear-gradient(
-                135deg,
-                #FFFFFF,
-                #EFF6FF
-            );
-
-        border: 1px solid #DBEAFE;
-
-        border-radius: 24px;
-
-        padding: 32px 36px;
-
-        margin-bottom: 28px;
-
+        background: #102A43;
+        border-radius: 26px;
+        padding: 40px 44px;
+        margin-bottom: 30px;
         box-shadow:
-            0 10px 30px
-            rgba(15, 23, 42, 0.06);
+            0 14px 35px rgba(7, 26, 43, 0.18);
     }
 
-    .badge {
-        display: inline-block;
-
-        padding: 7px 12px;
-
-        border-radius: 999px;
-
-        background: #DBEAFE;
-
-        color: #1D4ED8 !important;
-
-        font-size: 13px;
-
-        font-weight: 700;
-
-        margin-bottom: 12px;
-    }
-
-    .title {
-        font-size: 36px;
-
+    .hero-small {
+        color: #C8D8E3 !important;
+        font-size: 12px;
         font-weight: 800;
-
-        color: #0F172A !important;
+        letter-spacing: 0.12em;
     }
 
-    .subtitle {
-        color: #64748B !important;
+    .hero-title {
+        color: #FFFDF7 !important;
+        font-size: 40px;
+        font-weight: 850;
+        margin-top: 12px;
+    }
 
-        margin-top: 8px;
-
+    .hero-text {
+        color: #E4ECEF !important;
         font-size: 16px;
+        margin-top: 10px;
     }
 
     .menu-card {
-        background: #FFFFFF;
-
-        border: 1px solid #E2E8F0;
-
-        border-radius: 16px;
-
-        padding: 18px 20px;
-
-        margin-bottom: 10px;
-
+        background: #FFFDF7;
+        border: 1px solid #D8CEBA;
+        border-radius: 15px;
+        padding: 16px 19px;
+        margin-bottom: 9px;
         box-shadow:
-            0 5px 15px
-            rgba(15, 23, 42, 0.04);
+            0 4px 13px rgba(7, 26, 43, 0.055);
     }
 
-    .menu-number {
+    .number {
         display: inline-flex;
-
         align-items: center;
         justify-content: center;
 
-        width: 32px;
-        height: 32px;
+        width: 34px;
+        height: 34px;
 
-        background: #EFF6FF;
+        background: #164A41;
+        color: #F8F4EA !important;
 
-        color: #2563EB !important;
-
-        border-radius: 9px;
+        border-radius: 10px;
 
         font-weight: 800;
 
-        margin-right: 12px;
+        margin-right: 13px;
     }
 
     .menu-name {
-        color: #1E293B !important;
-
+        color: #17202A !important;
         font-size: 17px;
-
-        font-weight: 650;
+        font-weight: 700;
     }
 
     .info {
-        background: #FFFFFF;
-
-        border: 1px solid #E2E8F0;
-
-        border-radius: 18px;
-
-        padding: 20px;
-
-        margin-top: 20px;
+        background: #FFFDF7;
+        border: 1px solid #D8CEBA;
+        border-left: 5px solid #B58A4A;
+        border-radius: 14px;
+        padding: 18px;
+        color: #17202A !important;
     }
 
     </style>
@@ -207,7 +162,6 @@ def get_meal(ymd):
 
         return pd.DataFrame()
 
-
     try:
 
         rows = data[
@@ -222,7 +176,6 @@ def get_meal(ymd):
 
         return pd.DataFrame()
 
-
     return pd.DataFrame(rows)
 
 
@@ -234,17 +187,17 @@ st.markdown(
     f"""
     <div class="hero">
 
-        <div class="badge">
+        <div class="hero-small">
             DAILY MEAL
         </div>
 
-        <div class="title">
+        <div class="hero-title">
             📅 달력별 급식
         </div>
 
-        <div class="subtitle">
+        <div class="hero-text">
             {SCHOOL_NAME}의 날짜별 급식 메뉴를
-            한눈에 확인할 수 있습니다.
+            확인할 수 있습니다.
         </div>
 
     </div>
@@ -280,10 +233,6 @@ ymd = selected_date.strftime(
 )
 
 
-# =========================================================
-# GET DATA
-# =========================================================
-
 meal_df = get_meal(
     ymd
 )
@@ -312,10 +261,7 @@ else:
 
     if show_allergy:
 
-        display_text = menu_text.replace(
-            "<br/>",
-            "\n",
-        )
+        display_text = menu_text
 
     else:
 
@@ -323,30 +269,26 @@ else:
             r"\([^)]*\)",
             "",
             menu_text,
-        ).replace(
-            "<br/>",
-            "\n",
         )
+
+
+    display_text = display_text.replace(
+        "<br/>",
+        "\n",
+    )
 
 
     menu_items = [
-        item.strip()
-        for item in display_text.split(
-            "\n"
-        )
-        if item.strip()
+        x.strip()
+        for x in display_text.split("\n")
+        if x.strip()
     ]
 
-
-    # =====================================================
-    # STATS
-    # =====================================================
 
     c1, c2, c3 = st.columns(3)
 
 
     with c1:
-
         st.metric(
             "메뉴 수",
             len(menu_items),
@@ -354,7 +296,6 @@ else:
 
 
     with c2:
-
         st.metric(
             "칼로리",
             row.get(
@@ -365,7 +306,6 @@ else:
 
 
     with c3:
-
         st.metric(
             "날짜",
             selected_date.strftime(
@@ -373,10 +313,6 @@ else:
             ),
         )
 
-
-    # =====================================================
-    # MENU
-    # =====================================================
 
     st.markdown(
         "## 🍱 오늘의 메뉴"
@@ -392,7 +328,7 @@ else:
             f"""
             <div class="menu-card">
 
-                <span class="menu-number">
+                <span class="number">
                     {i}
                 </span>
 
@@ -405,10 +341,6 @@ else:
             unsafe_allow_html=True,
         )
 
-
-    # =====================================================
-    # EXTRA INFORMATION
-    # =====================================================
 
     nutrition = row.get(
         "NTR_INFO",
