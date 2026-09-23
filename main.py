@@ -19,6 +19,10 @@ st.set_page_config(
 )
 
 
+# =========================================================
+# CONSTANTS
+# =========================================================
+
 NEIS_URL = "https://open.neis.go.kr/hub"
 DEFAULT_SCHOOL = "송탄고등학교"
 
@@ -32,433 +36,228 @@ st.markdown(
     <style>
 
     /* =====================================================
-       BASIC
-    ===================================================== */
-
-    html,
-    body,
-    [class*="css"] {
-        font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            sans-serif;
-    }
+       MAIN PAGE
+       Светлый фон → тёмный текст
+       ===================================================== */
 
     .stApp {
-        background: #F1E8D5;
+        background-color: #F7F4EC !important;
+        color: #1F2933 !important;
     }
 
     .main {
-        background: #F1E8D5;
+        background-color: #F7F4EC !important;
     }
 
     .main .block-container {
-        max-width: 1250px;
-        padding-top: 42px;
-        padding-bottom: 60px;
+        max-width: 1200px;
+        padding-top: 35px;
+        padding-bottom: 50px;
     }
 
 
     /* =====================================================
        MAIN TEXT
-       Светлый фон → ТОЛЬКО тёмный текст
-    ===================================================== */
+       ===================================================== */
+
+    .main p {
+        color: #1F2933 !important;
+    }
 
     .main h1,
     .main h2,
     .main h3,
-    .main h4,
-    .main p,
-    .main label {
-        color: #17202A !important;
+    .main h4 {
+        color: #102A43 !important;
     }
 
 
     /* =====================================================
        SIDEBAR
-       Тёмный фон → ТОЛЬКО светлый текст
-    ===================================================== */
+       Тёмный фон → светлый текст
+       ===================================================== */
 
     section[data-testid="stSidebar"] {
-        background: #071A2B !important;
-        border-right: 1px solid #163B55;
+        background-color: #102A43 !important;
     }
 
     section[data-testid="stSidebar"] > div {
-        background: #071A2B !important;
+        background-color: #102A43 !important;
     }
 
-    section[data-testid="stSidebar"] * {
-        color: #F8F4EA !important;
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] label {
+        color: #F8FAFC !important;
     }
+
+
+    /* =====================================================
+       SIDEBAR INPUT
+       ===================================================== */
 
     section[data-testid="stSidebar"] input {
-        background: #102A43 !important;
-        color: #FFFDF7 !important;
-        border: 1px solid #35566F !important;
+        background-color: #FFFFFF !important;
+        color: #1F2933 !important;
+        border-radius: 8px !important;
     }
 
     section[data-testid="stSidebar"] input::placeholder {
-        color: #C9D5DE !important;
-    }
-
-    section[data-testid="stSidebar"] div[data-baseweb="select"] > div {
-        background: #102A43 !important;
-        color: #FFFDF7 !important;
-        border: 1px solid #35566F !important;
+        color: #6B7280 !important;
     }
 
 
     /* =====================================================
-       SIDEBAR HEADER
-    ===================================================== */
+       SIDEBAR SELECT
+       ===================================================== */
 
-    .sidebar-brand {
-        padding: 8px 4px 28px 4px;
+    section[data-testid="stSidebar"]
+    div[data-baseweb="select"] > div {
+        background-color: #FFFFFF !important;
+        color: #1F2933 !important;
+        border-radius: 8px !important;
     }
 
-    .sidebar-brand-title {
-        color: #FFFDF7 !important;
-        font-size: 24px;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-    }
-
-    .sidebar-brand-subtitle {
-        color: #C9D5DE !important;
-        font-size: 12px;
-        margin-top: 5px;
-    }
-
-    .sidebar-section {
-        color: #D7E5DF !important;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin-top: 24px;
-        margin-bottom: 9px;
+    section[data-testid="stSidebar"]
+    div[data-baseweb="select"] span {
+        color: #1F2933 !important;
     }
 
 
     /* =====================================================
-       HERO
-    ===================================================== */
-
-    .hero {
-        background: #102A43;
-
-        border: 1px solid #183B57;
-
-        border-radius: 26px;
-
-        padding: 40px 44px;
-
-        box-shadow:
-            0 14px 35px rgba(7, 26, 43, 0.18);
-
-        margin-bottom: 30px;
-    }
-
-    .hero-small {
-        color: #C8D8E3 !important;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        margin-bottom: 13px;
-    }
-
-    .hero-title {
-        color: #FFFDF7 !important;
-        font-size: 40px;
-        font-weight: 850;
-        line-height: 1.15;
-        letter-spacing: -0.045em;
-    }
-
-    .hero-description {
-        color: #E4ECEF !important;
-        font-size: 16px;
-        line-height: 1.75;
-        margin-top: 13px;
-        max-width: 780px;
-    }
-
-    .hero-school {
-        color: #E7C98B !important;
-        font-weight: 800;
-    }
-
-
-    /* =====================================================
-       SECTION TITLE
-    ===================================================== */
-
-    .section {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        margin-top: 32px;
-        margin-bottom: 16px;
-    }
-
-    .section-line {
-        width: 5px;
-        height: 30px;
-
-        background: #164A41;
-
-        border-radius: 10px;
-    }
-
-    .section-title {
-        color: #102A43 !important;
-        font-size: 25px;
-        font-weight: 850;
-        letter-spacing: -0.035em;
-    }
-
-
-    /* =====================================================
-       STAT CARDS
-       Светлые карточки → тёмный текст
-    ===================================================== */
-
-    .stat-card {
-        background: #FFFDF7;
-
-        border: 1px solid #D8CEBA;
-
-        border-radius: 19px;
-
-        padding: 23px 25px;
-
-        min-height: 132px;
-
-        box-shadow:
-            0 7px 20px rgba(7, 26, 43, 0.07);
-    }
-
-    .stat-card-green {
-        border-top: 5px solid #164A41;
-    }
-
-    .stat-card-blue {
-        border-top: 5px solid #102A43;
-    }
-
-    .stat-card-beige {
-        border-top: 5px solid #B58A4A;
-    }
-
-    .stat-label {
-        color: #65727D !important;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.09em;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        color: #102A43 !important;
-        font-size: 28px;
-        font-weight: 850;
-        margin-top: 8px;
-    }
-
-    .stat-description {
-        color: #71808A !important;
-        font-size: 12px;
-        margin-top: 6px;
-    }
-
-
-    /* =====================================================
-       MENU CARDS
-    ===================================================== */
-
-    .menu-card {
-        display: flex;
-        align-items: center;
-
-        background: #FFFDF7;
-
-        border: 1px solid #D8CEBA;
-
-        border-radius: 15px;
-
-        padding: 15px 18px;
-
-        margin-bottom: 9px;
-
-        box-shadow:
-            0 4px 13px rgba(7, 26, 43, 0.055);
-    }
-
-    .menu-number {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        width: 35px;
-        height: 35px;
-
-        background: #164A41;
-
-        color: #F8F4EA !important;
-
-        border-radius: 10px;
-
-        font-size: 14px;
-        font-weight: 800;
-
-        margin-right: 14px;
-
-        flex-shrink: 0;
-    }
-
-    .menu-name {
-        color: #17202A !important;
-        font-size: 17px;
-        font-weight: 700;
-    }
-
-
-    /* =====================================================
-       DARK INFORMATION CARD
-       Тёмный фон → светлый текст
-    ===================================================== */
-
-    .dark-card {
-        background: #164A41;
-
-        border: 1px solid #245D52;
-
-        border-radius: 20px;
-
-        padding: 25px;
-
-        margin-top: 22px;
-    }
-
-    .dark-card-title {
-        color: #FFFDF7 !important;
-        font-size: 18px;
-        font-weight: 800;
-    }
-
-    .dark-card-text {
-        color: #E7F0EC !important;
-        font-size: 14px;
-        line-height: 1.7;
-        margin-top: 7px;
-    }
-
-
-    /* =====================================================
-       INFO BOX
-    ===================================================== */
-
-    .info-box {
-        background: #FFFDF7;
-
-        border-left: 5px solid #B58A4A;
-
-        border-top: 1px solid #D8CEBA;
-        border-right: 1px solid #D8CEBA;
-        border-bottom: 1px solid #D8CEBA;
-
-        border-radius: 14px;
-
-        padding: 18px 20px;
-
-        color: #17202A !important;
-
-        line-height: 1.7;
-    }
-
-
-    /* =====================================================
-       INPUTS IN MAIN
-    ===================================================== */
+       MAIN INPUT
+       Светлый фон → тёмный текст
+       ===================================================== */
 
     div[data-baseweb="input"] {
-        background: #FFFDF7 !important;
-        border-radius: 12px !important;
+        background-color: #FFFFFF !important;
+        border-radius: 8px !important;
     }
 
     div[data-baseweb="input"] input {
-        color: #17202A !important;
-        background: #FFFDF7 !important;
+        background-color: #FFFFFF !important;
+        color: #1F2933 !important;
     }
 
-    div[data-baseweb="select"] > div {
-        background: #FFFDF7 !important;
-        color: #17202A !important;
-        border: 1px solid #CFC3AC !important;
-        border-radius: 12px !important;
+    input {
+        color: #1F2933 !important;
+        background-color: #FFFFFF !important;
+    }
+
+    textarea {
+        color: #1F2933 !important;
+        background-color: #FFFFFF !important;
     }
 
 
     /* =====================================================
-       DIVIDER
-    ===================================================== */
+       MAIN SELECT
+       ===================================================== */
 
-    hr {
-        border-color: #D4C8B1 !important;
-        margin-top: 35px;
-        margin-bottom: 35px;
+    div[data-baseweb="select"] > div {
+        background-color: #FFFFFF !important;
+        color: #1F2933 !important;
+        border-radius: 8px !important;
+    }
+
+    div[data-baseweb="select"] span {
+        color: #1F2933 !important;
+    }
+
+
+    /* =====================================================
+       METRIC CARDS
+       ===================================================== */
+
+    [data-testid="stMetric"] {
+        background-color: #FFFFFF !important;
+        border: 1px solid #D9D4C8 !important;
+        border-radius: 12px !important;
+        padding: 18px !important;
+    }
+
+    [data-testid="stMetricLabel"] {
+        color: #52606D !important;
+    }
+
+    [data-testid="stMetricValue"] {
+        color: #102A43 !important;
+    }
+
+    [data-testid="stMetricDelta"] {
+        color: #164A41 !important;
     }
 
 
     /* =====================================================
        EXPANDER
-    ===================================================== */
+       ===================================================== */
 
-    details {
-        background: #FFFDF7 !important;
-        border: 1px solid #D8CEBA !important;
-        border-radius: 14px !important;
+    [data-testid="stExpander"] {
+        background-color: #FFFFFF !important;
+        border: 1px solid #D9D4C8 !important;
+        border-radius: 10px !important;
     }
 
-    details summary {
+    [data-testid="stExpander"] summary {
         color: #102A43 !important;
-        font-weight: 750 !important;
     }
 
 
     /* =====================================================
-       TABLE
-    ===================================================== */
+       BUTTON
+       ===================================================== */
+
+    .stButton button {
+        background-color: #164A41 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 8px !important;
+    }
+
+    .stButton button:hover {
+        background-color: #123B34 !important;
+        color: #FFFFFF !important;
+    }
+
+
+    /* =====================================================
+       ALERTS
+       ===================================================== */
+
+    [data-testid="stAlert"] {
+        color: #1F2933 !important;
+    }
+
+
+    /* =====================================================
+       LINKS
+       ===================================================== */
+
+    a {
+        color: #164A41 !important;
+    }
+
+
+    /* =====================================================
+       DIVIDERS
+       ===================================================== */
+
+    hr {
+        border-color: #D9D4C8 !important;
+    }
+
+
+    /* =====================================================
+       DATAFRAME
+       ===================================================== */
 
     [data-testid="stDataFrame"] {
-        border: 1px solid #D8CEBA;
-        border-radius: 14px;
+        background-color: #FFFFFF !important;
+        border: 1px solid #D9D4C8 !important;
+        border-radius: 10px !important;
         overflow: hidden;
     }
 
-
-    /* =====================================================
-       FOOTER
-    ===================================================== */
-
-    .footer {
-        text-align: center;
-
-        margin-top: 50px;
-
-        padding-top: 25px;
-
-        border-top: 1px solid #D4C8B1;
-
-        color: #697780 !important;
-
-        font-size: 12px;
-
-        line-height: 1.7;
-    }
 
     </style>
     """,
@@ -467,7 +266,7 @@ st.markdown(
 
 
 # =========================================================
-# API
+# API REQUEST
 # =========================================================
 
 def api_get(endpoint, params):
@@ -543,6 +342,10 @@ def search_schools(query):
     return pd.DataFrame(rows)
 
 
+# =========================================================
+# SCHOOL SEARCH FALLBACK
+# =========================================================
+
 def school_search_with_fallback(query):
 
     df = search_schools(query)
@@ -578,6 +381,10 @@ def school_search_with_fallback(query):
     return pd.DataFrame()
 
 
+# =========================================================
+# SCHOOL LABEL
+# =========================================================
+
 def school_label(row):
 
     return (
@@ -590,7 +397,7 @@ def school_label(row):
 
 
 # =========================================================
-# MEAL
+# GET MEAL DATA
 # =========================================================
 
 @st.cache_data(ttl=600)
@@ -648,12 +455,14 @@ def clean_menu(text):
     ):
         return ""
 
+    # Remove allergen numbers
     text = re.sub(
         r"\([^)]*\)",
         "",
         text,
     )
 
+    # Convert HTML line breaks
     text = text.replace(
         "<br/>",
         "\n",
@@ -661,6 +470,10 @@ def clean_menu(text):
 
     return text.strip()
 
+
+# =========================================================
+# CALORIE
+# =========================================================
 
 def parse_kcal(value):
 
@@ -676,6 +489,7 @@ def parse_kcal(value):
     )
 
     if match:
+
         return float(
             match.group()
         )
@@ -684,7 +498,7 @@ def parse_kcal(value):
 
 
 # =========================================================
-# DATE
+# KOREA DATE
 # =========================================================
 
 today_korea = (
@@ -698,26 +512,11 @@ today_korea = (
 # =========================================================
 
 st.sidebar.markdown(
-    """
-    <div class="sidebar-brand">
-
-        <div class="sidebar-brand-title">
-            🍚 급식 데이터
-        </div>
-
-        <div class="sidebar-brand-subtitle">
-            NEIS SCHOOL MEAL
-        </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True,
+    "## 🍚 급식 데이터"
 )
 
-
-st.sidebar.markdown(
-    '<div class="sidebar-section">학교 선택</div>',
-    unsafe_allow_html=True,
+st.sidebar.caption(
+    "NEIS SCHOOL MEAL"
 )
 
 
@@ -781,12 +580,6 @@ school_code = selected_school[
 ]
 
 
-st.sidebar.markdown(
-    '<div class="sidebar-section">날짜</div>',
-    unsafe_allow_html=True,
-)
-
-
 selected_date = st.sidebar.date_input(
     "급식 날짜",
     value=today_korea,
@@ -799,58 +592,30 @@ ymd = selected_date.strftime(
 
 
 # =========================================================
-# HERO
+# TITLE
 # =========================================================
 
-st.markdown(
-    f"""
-    <div class="hero">
+st.title(
+    "🍚 우리학교 급식 데이터"
+)
 
-        <div class="hero-small">
-            NEIS · SCHOOL MEAL DATA
-        </div>
-
-        <div class="hero-title">
-            🍚 우리학교 급식 데이터
-        </div>
-
-        <div class="hero-description">
-            나이스 교육정보 API를 이용하여
-            <span class="hero-school">
-                {school_name}
-            </span>
-            의 급식 정보를 확인하고
-            데이터를 분석할 수 있습니다.
-        </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True,
+st.write(
+    "NEIS 나이스 교육정보 API를 이용하여 "
+    "학교 급식 정보를 확인할 수 있습니다."
 )
 
 
 # =========================================================
-# SECTION
+# SCHOOL TITLE
 # =========================================================
 
-st.markdown(
-    """
-    <div class="section">
-
-        <div class="section-line"></div>
-
-        <div class="section-title">
-            오늘의 급식
-        </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True,
+st.header(
+    f"🍽️ {school_name} 급식"
 )
 
 
 # =========================================================
-# MEAL
+# GET MEAL
 # =========================================================
 
 meal_df = get_meal(
@@ -862,18 +627,18 @@ meal_df = get_meal(
 
 if meal_df.empty:
 
-    st.markdown(
-        """
-        <div class="info-box">
-            📭 선택한 날짜에는 급식 데이터가 없습니다.
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.info(
+        "📭 선택한 날짜에는 급식 데이터가 없습니다."
     )
 
 else:
 
     row = meal_df.iloc[0]
+
+
+    # =====================================================
+    # MENU
+    # =====================================================
 
     menu_text = clean_menu(
         row.get(
@@ -882,12 +647,6 @@ else:
         )
     )
 
-    kcal = parse_kcal(
-        row.get(
-            "CAL_INFO",
-            "",
-        )
-    )
 
     menu_items = [
         item.strip()
@@ -897,107 +656,65 @@ else:
 
 
     # =====================================================
-    # STATS
+    # CALORIE
     # =====================================================
 
-    c1, c2, c3 = st.columns(3)
+    kcal = parse_kcal(
+        row.get(
+            "CAL_INFO",
+            "",
+        )
+    )
 
 
-    with c1:
+    # =====================================================
+    # METRICS
+    # =====================================================
 
-        st.markdown(
-            f"""
-            <div class="stat-card stat-card-green">
+    col1, col2, col3 = st.columns(3)
 
-                <div class="stat-label">
-                    MENU
-                </div>
 
-                <div class="stat-value">
-                    {len(menu_items)}
-                </div>
+    with col1:
 
-                <div class="stat-description">
-                    오늘 제공되는 메뉴
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
+        st.metric(
+            "메뉴 수",
+            len(menu_items),
         )
 
 
-    with c2:
+    with col2:
 
-        kcal_text = (
-            f"{kcal:,.0f} kcal"
-            if kcal is not None
-            else "-"
-        )
+        if kcal is not None:
 
-        st.markdown(
-            f"""
-            <div class="stat-card stat-card-blue">
+            st.metric(
+                "칼로리",
+                f"{kcal:,.0f} kcal",
+            )
 
-                <div class="stat-label">
-                    ENERGY
-                </div>
+        else:
 
-                <div class="stat-value">
-                    {kcal_text}
-                </div>
-
-                <div class="stat-description">
-                    급식 열량
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            st.metric(
+                "칼로리",
+                "-",
+            )
 
 
-    with c3:
+    with col3:
 
-        st.markdown(
-            f"""
-            <div class="stat-card stat-card-beige">
-
-                <div class="stat-label">
-                    DATE
-                </div>
-
-                <div class="stat-value">
-                    {selected_date.strftime('%Y.%m.%d')}
-                </div>
-
-                <div class="stat-description">
-                    선택한 급식 날짜
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
+        st.metric(
+            "날짜",
+            selected_date.strftime(
+                "%Y-%m-%d"
+            ),
         )
 
 
     # =====================================================
-    # MENU
+    # TODAY MENU
     # =====================================================
 
-    st.markdown(
-        """
-        <div class="section">
-
-            <div class="section-line"></div>
-
-            <div class="section-title">
-                🍱 오늘의 메뉴
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.subheader(
+        "🍱 오늘의 메뉴"
     )
 
 
@@ -1008,45 +725,25 @@ else:
 
         st.markdown(
             f"""
-            <div class="menu-card">
-
-                <div class="menu-number">
-                    {i}
-                </div>
-
-                <div class="menu-name">
+            <div style="
+                background-color:#FFFFFF;
+                border:1px solid #D9D4C8;
+                border-radius:10px;
+                padding:14px 18px;
+                margin-bottom:8px;
+                color:#1F2933;
+                font-size:16px;
+            ">
+                <b style="color:#164A41;">
+                    {i}.
+                </b>
+                <span style="color:#1F2933;">
                     {menu}
-                </div>
-
+                </span>
             </div>
             """,
             unsafe_allow_html=True,
         )
-
-
-    # =====================================================
-    # GREEN INFORMATION CARD
-    # =====================================================
-
-    st.markdown(
-        f"""
-        <div class="dark-card">
-
-            <div class="dark-card-title">
-                🌿 오늘의 급식 한눈에 보기
-            </div>
-
-            <div class="dark-card-text">
-                {school_name}
-                · {selected_date.strftime('%Y년 %m월 %d일')}
-                · 메뉴 {len(menu_items)}개
-                · {kcal:,.0f} kcal
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
 
 
     # =====================================================
@@ -1063,19 +760,141 @@ else:
 
 
 # =========================================================
+# SCHOOL COMPARISON
+# =========================================================
+
+st.divider()
+
+st.header(
+    "🏫 학교별 급식 비교"
+)
+
+
+comparison_options = school_options
+
+
+selected_comparison = st.multiselect(
+    "비교할 학교를 선택하세요.",
+    comparison_options,
+    default=(
+        comparison_options[:3]
+        if len(comparison_options) >= 3
+        else comparison_options
+    ),
+)
+
+
+if len(selected_comparison) < 2:
+
+    st.info(
+        "두 개 이상의 학교를 선택하면 비교할 수 있습니다."
+    )
+
+else:
+
+    comparison_rows = []
+
+
+    for label in selected_comparison:
+
+        idx = comparison_options.index(
+            label
+        )
+
+        school = school_df.iloc[idx]
+
+
+        comparison_meal = get_meal(
+            school["SD_SCHUL_CODE"],
+            school["ATPT_OFCDC_SC_CODE"],
+            ymd,
+        )
+
+
+        if comparison_meal.empty:
+            continue
+
+
+        comparison_row = (
+            comparison_meal.iloc[0]
+        )
+
+
+        kcal_value = parse_kcal(
+            comparison_row.get(
+                "CAL_INFO",
+                "",
+            )
+        )
+
+
+        if kcal_value is not None:
+
+            comparison_rows.append(
+                {
+                    "학교": school["SCHUL_NM"],
+                    "칼로리": kcal_value,
+                }
+            )
+
+
+    if comparison_rows:
+
+        comparison_df = pd.DataFrame(
+            comparison_rows
+        )
+
+
+        st.dataframe(
+            comparison_df,
+            use_container_width=True,
+            hide_index=True,
+        )
+
+
+        fig = px.bar(
+            comparison_df,
+            x="학교",
+            y="칼로리",
+            text="칼로리",
+            title="학교별 급식 칼로리 비교",
+        )
+
+
+        fig.update_traces(
+            marker_color="#164A41"
+        )
+
+
+        fig.update_layout(
+            paper_bgcolor="#F7F4EC",
+            plot_bgcolor="#FFFFFF",
+            font_color="#1F2933",
+            title_font_color="#102A43",
+            xaxis_title="학교",
+            yaxis_title="칼로리 (kcal)",
+        )
+
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+        )
+
+    else:
+
+        st.info(
+            "비교할 학교의 급식 데이터가 없습니다."
+        )
+
+
+# =========================================================
 # FOOTER
 # =========================================================
 
-st.markdown(
-    """
-    <div class="footer">
+st.divider()
 
-        교육부 NEIS 교육정보 개방 포털<br>
-
-        <b>우리학교 급식 데이터</b>
-        · School Meal Data Dashboard
-
-    </div>
-    """,
-    unsafe_allow_html=True,
+st.caption(
+    "교육부 NEIS 교육정보 개방 포털 · "
+    "우리학교 급식 데이터"
 )
