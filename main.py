@@ -2,7 +2,6 @@ import datetime
 import re
 
 import pandas as pd
-import plotly.express as px
 import requests
 import streamlit as st
 
@@ -12,19 +11,21 @@ import streamlit as st
 # =========================================================
 
 st.set_page_config(
-    page_title="우리학교 급식 데이터",
-    page_icon="🍚",
+    page_title="평택 고등학교 급식의 칼로리는 메뉴에 따라 얼마나 달라질까?",
+    page_icon="🍱",
     layout="wide",
-    initial_sidebar_state="expanded",
 )
 
 
 # =========================================================
-# CONSTANTS
+# NEIS API SETTINGS
 # =========================================================
 
-NEIS_URL = "https://open.neis.go.kr/hub"
-DEFAULT_SCHOOL = "송탄고등학교"
+NEIS_URL = "https://open.neis.go.kr/hub/mealServiceDietInfo"
+
+OFFICE_CODE = "J10"
+SCHOOL_CODE = "7530480"
+SCHOOL_NAME = "송탄고등학교"
 
 
 # =========================================================
@@ -35,10 +36,9 @@ st.markdown(
     """
     <style>
 
-    /* =====================================================
-       MAIN PAGE
-       Светлый фон → тёмный текст
-       ===================================================== */
+    /* =========================================
+       전체 배경
+       ========================================= */
 
     .stApp {
         background-color: #F7F4EC !important;
@@ -52,13 +52,13 @@ st.markdown(
     .main .block-container {
         max-width: 1200px;
         padding-top: 35px;
-        padding-bottom: 50px;
+        padding-bottom: 60px;
     }
 
 
-    /* =====================================================
-       MAIN TEXT
-       ===================================================== */
+    /* =========================================
+       기본 텍스트
+       ========================================= */
 
     .main p {
         color: #1F2933 !important;
@@ -72,65 +72,13 @@ st.markdown(
     }
 
 
-    /* =====================================================
-       SIDEBAR
-       Тёмный фон → светлый текст
-       ===================================================== */
-
-    section[data-testid="stSidebar"] {
-        background-color: #102A43 !important;
-    }
-
-    section[data-testid="stSidebar"] > div {
-        background-color: #102A43 !important;
-    }
-
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] label {
-        color: #F8FAFC !important;
-    }
-
-
-    /* =====================================================
-       SIDEBAR INPUT
-       ===================================================== */
-
-    section[data-testid="stSidebar"] input {
-        background-color: #FFFFFF !important;
-        color: #1F2933 !important;
-        border-radius: 8px !important;
-    }
-
-    section[data-testid="stSidebar"] input::placeholder {
-        color: #6B7280 !important;
-    }
-
-
-    /* =====================================================
-       SIDEBAR SELECT
-       ===================================================== */
-
-    section[data-testid="stSidebar"]
-    div[data-baseweb="select"] > div {
-        background-color: #FFFFFF !important;
-        color: #1F2933 !important;
-        border-radius: 8px !important;
-    }
-
-    section[data-testid="stSidebar"]
-    div[data-baseweb="select"] span {
-        color: #1F2933 !important;
-    }
-
-
-    /* =====================================================
-       MAIN INPUT
-       Светлый фон → тёмный текст
-       ===================================================== */
+    /* =========================================
+       날짜 입력
+       ========================================= */
 
     div[data-baseweb="input"] {
         background-color: #FFFFFF !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
     }
 
     div[data-baseweb="input"] input {
@@ -138,124 +86,59 @@ st.markdown(
         color: #1F2933 !important;
     }
 
-    input {
-        color: #1F2933 !important;
-        background-color: #FFFFFF !important;
-    }
 
-    textarea {
-        color: #1F2933 !important;
-        background-color: #FFFFFF !important;
-    }
+    /* =========================================
+       토글
+       ========================================= */
 
-
-    /* =====================================================
-       MAIN SELECT
-       ===================================================== */
-
-    div[data-baseweb="select"] > div {
-        background-color: #FFFFFF !important;
-        color: #1F2933 !important;
-        border-radius: 8px !important;
-    }
-
-    div[data-baseweb="select"] span {
+    [data-testid="stToggle"] label {
         color: #1F2933 !important;
     }
 
 
-    /* =====================================================
-       METRIC CARDS
-       ===================================================== */
+    /* =========================================
+       메트릭 카드
+       ========================================= */
 
     [data-testid="stMetric"] {
         background-color: #FFFFFF !important;
         border: 1px solid #D9D4C8 !important;
-        border-radius: 12px !important;
-        padding: 18px !important;
+        border-radius: 14px !important;
+        padding: 20px !important;
     }
 
     [data-testid="stMetricLabel"] {
         color: #52606D !important;
+        font-size: 15px !important;
     }
 
     [data-testid="stMetricValue"] {
         color: #102A43 !important;
-    }
-
-    [data-testid="stMetricDelta"] {
-        color: #164A41 !important;
-    }
-
-
-    /* =====================================================
-       EXPANDER
-       ===================================================== */
-
-    [data-testid="stExpander"] {
-        background-color: #FFFFFF !important;
-        border: 1px solid #D9D4C8 !important;
-        border-radius: 10px !important;
-    }
-
-    [data-testid="stExpander"] summary {
-        color: #102A43 !important;
+        font-size: 30px !important;
+        font-weight: 700 !important;
     }
 
 
-    /* =====================================================
-       BUTTON
-       ===================================================== */
-
-    .stButton button {
-        background-color: #164A41 !important;
-        color: #FFFFFF !important;
-        border: none !important;
-        border-radius: 8px !important;
-    }
-
-    .stButton button:hover {
-        background-color: #123B34 !important;
-        color: #FFFFFF !important;
-    }
-
-
-    /* =====================================================
-       ALERTS
-       ===================================================== */
-
-    [data-testid="stAlert"] {
-        color: #1F2933 !important;
-    }
-
-
-    /* =====================================================
-       LINKS
-       ===================================================== */
-
-    a {
-        color: #164A41 !important;
-    }
-
-
-    /* =====================================================
-       DIVIDERS
-       ===================================================== */
+    /* =========================================
+       구분선
+       ========================================= */
 
     hr {
         border-color: #D9D4C8 !important;
     }
 
 
-    /* =====================================================
-       DATAFRAME
-       ===================================================== */
+    /* =========================================
+       Sidebar
+       ========================================= */
 
-    [data-testid="stDataFrame"] {
-        background-color: #FFFFFF !important;
-        border: 1px solid #D9D4C8 !important;
-        border-radius: 10px !important;
-        overflow: hidden;
+    section[data-testid="stSidebar"] {
+        background-color: #102A43 !important;
+    }
+
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] label {
+        color: #FFFFFF !important;
     }
 
 
@@ -266,165 +149,51 @@ st.markdown(
 
 
 # =========================================================
-# API REQUEST
+# GET MEAL DATA
 # =========================================================
 
-def api_get(endpoint, params):
+@st.cache_data(ttl=600)
+def get_meal(ymd):
+
+    params = {
+        "Type": "json",
+        "pIndex": 1,
+        "pSize": 100,
+        "ATPT_OFCDC_SC_CODE": OFFICE_CODE,
+        "SD_SCHUL_CODE": SCHOOL_CODE,
+        "MMEAL_SC_CODE": 2,
+        "MLSV_FROM_YMD": ymd,
+        "MLSV_TO_YMD": ymd,
+    }
 
     try:
 
         response = requests.get(
-            f"{NEIS_URL}/{endpoint}",
+            NEIS_URL,
             params=params,
             timeout=10,
         )
 
         response.raise_for_status()
 
-        return response.json()
+        data = response.json()
 
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException:
 
         st.error(
-            f"API 요청 중 오류가 발생했습니다: {e}"
+            "NEIS API에 연결할 수 없습니다."
         )
 
-        return None
+        return pd.DataFrame()
 
     except ValueError:
 
         st.error(
-            "API 응답을 읽을 수 없습니다."
+            "NEIS API 응답을 읽을 수 없습니다."
         )
 
-        return None
-
-
-# =========================================================
-# SCHOOL SEARCH
-# =========================================================
-
-@st.cache_data(ttl=3600)
-def search_schools(query):
-
-    if not query:
         return pd.DataFrame()
 
-    params = {
-        "Type": "json",
-        "pIndex": 1,
-        "pSize": 100,
-        "SCHUL_NM": query,
-    }
-
-    data = api_get(
-        "schoolInfo",
-        params,
-    )
-
-    if not data:
-        return pd.DataFrame()
-
-    try:
-
-        rows = data[
-            "schoolInfo"
-        ][1]["row"]
-
-    except (
-        KeyError,
-        IndexError,
-        TypeError,
-    ):
-
-        return pd.DataFrame()
-
-    return pd.DataFrame(rows)
-
-
-# =========================================================
-# SCHOOL SEARCH FALLBACK
-# =========================================================
-
-def school_search_with_fallback(query):
-
-    df = search_schools(query)
-
-    if not df.empty:
-        return df
-
-    replacements = [
-        ("여고", "여자고등학교"),
-        ("여중", "여자중학교"),
-        ("여초", "여자초등학교"),
-        ("고", "고등학교"),
-        ("중", "중학교"),
-        ("초", "초등학교"),
-    ]
-
-    for short, full in replacements:
-
-        if query.endswith(short):
-
-            new_query = (
-                query[:-len(short)]
-                + full
-            )
-
-            df = search_schools(
-                new_query
-            )
-
-            if not df.empty:
-                return df
-
-    return pd.DataFrame()
-
-
-# =========================================================
-# SCHOOL LABEL
-# =========================================================
-
-def school_label(row):
-
-    return (
-        f"{row.get('SCHUL_NM', '')}"
-        f" | "
-        f"{row.get('ATPT_OFCDC_SC_NM', '')}"
-        f" | "
-        f"{row.get('SCHUL_KND_SC_NM', '')}"
-    )
-
-
-# =========================================================
-# GET MEAL DATA
-# =========================================================
-
-@st.cache_data(ttl=600)
-def get_meal(
-    school_code,
-    office_code,
-    ymd,
-):
-
-    params = {
-        "Type": "json",
-        "pIndex": 1,
-        "pSize": 100,
-        "ATPT_OFCDC_SC_CODE": office_code,
-        "SD_SCHUL_CODE": school_code,
-        "MMEAL_SC_CODE": 2,
-        "MLSV_FROM_YMD": ymd,
-        "MLSV_TO_YMD": ymd,
-    }
-
-    data = api_get(
-        "mealServiceDietInfo",
-        params,
-    )
-
-    if not data:
-        return pd.DataFrame()
 
     try:
 
@@ -432,6 +201,8 @@ def get_meal(
             "mealServiceDietInfo"
         ][1]["row"]
 
+        return pd.DataFrame(rows)
+
     except (
         KeyError,
         IndexError,
@@ -440,47 +211,36 @@ def get_meal(
 
         return pd.DataFrame()
 
-    return pd.DataFrame(rows)
-
 
 # =========================================================
-# CLEAN MENU
+# MENU CLEANING
 # =========================================================
 
-def clean_menu(text):
+def remove_allergy_numbers(menu):
 
-    if not isinstance(
-        text,
-        str,
-    ):
-        return ""
+    """
+    메뉴 뒤의 알레르기 번호를 제거한다.
 
-    # Remove allergen numbers
-    text = re.sub(
-        r"\([^)]*\)",
+    예:
+    치킨마요덮밥(1.5.6.15)
+    →
+    치킨마요덮밥
+    """
+
+    return re.sub(
+        r"\s*\([^)]*\)",
         "",
-        text,
-    )
-
-    # Convert HTML line breaks
-    text = text.replace(
-        "<br/>",
-        "\n",
-    )
-
-    return text.strip()
+        menu,
+    ).strip()
 
 
 # =========================================================
-# CALORIE
+# CALORIE PARSING
 # =========================================================
 
 def parse_kcal(value):
 
-    if not isinstance(
-        value,
-        str,
-    ):
+    if not isinstance(value, str):
         return None
 
     match = re.search(
@@ -508,384 +268,297 @@ today_korea = (
 
 
 # =========================================================
-# SIDEBAR
+# PAGE TITLE
 # =========================================================
 
-st.sidebar.markdown(
-    "## 🍚 급식 데이터"
+st.title(
+    "🍱 평택 고등학교 급식의 칼로리는 메뉴에 따라 얼마나 달라질까?"
 )
 
-st.sidebar.caption(
-    "NEIS SCHOOL MEAL"
-)
-
-
-school_query = st.sidebar.text_input(
-    "학교 이름",
-    value=DEFAULT_SCHOOL,
+st.write(
+    "송탄고등학교의 중식 데이터를 날짜별로 확인하고 "
+    "메뉴 구성과 칼로리를 비교합니다."
 )
 
 
-school_df = school_search_with_fallback(
-    school_query
+# =========================================================
+# DATE + ALLERGY SWITCH
+# =========================================================
+
+date_col, allergy_col = st.columns(
+    [1, 1]
 )
 
 
-if school_df.empty:
+with date_col:
 
-    st.warning(
-        "검색된 학교가 없습니다."
+    selected_date = st.date_input(
+        "📅 급식 날짜",
+        value=today_korea,
     )
 
-    st.stop()
 
+with allergy_col:
 
-school_options = [
-    school_label(row)
-    for _, row
-    in school_df.iterrows()
-]
+    st.write("알레르기 정보")
 
-
-selected_school_label = (
-    st.sidebar.selectbox(
-        "학교 선택",
-        school_options,
+    show_allergy = st.toggle(
+        "알레르기 정보 보기",
+        value=True,
     )
-)
 
 
-selected_index = (
-    school_options.index(
-        selected_school_label
-    )
-)
-
-
-selected_school = school_df.iloc[
-    selected_index
-]
-
-
-school_name = selected_school[
-    "SCHUL_NM"
-]
-
-office_code = selected_school[
-    "ATPT_OFCDC_SC_CODE"
-]
-
-school_code = selected_school[
-    "SD_SCHUL_CODE"
-]
-
-
-selected_date = st.sidebar.date_input(
-    "급식 날짜",
-    value=today_korea,
-)
-
+# =========================================================
+# GET DATA
+# =========================================================
 
 ymd = selected_date.strftime(
     "%Y%m%d"
 )
 
-
-# =========================================================
-# TITLE
-# =========================================================
-
-st.title(
-    "🍚 우리학교 급식 데이터"
-)
-
-st.write(
-    "NEIS 나이스 교육정보 API를 이용하여 "
-    "학교 급식 정보를 확인할 수 있습니다."
-)
-
-
-# =========================================================
-# SCHOOL TITLE
-# =========================================================
-
-st.header(
-    f"🍽️ {school_name} 급식"
-)
-
-
-# =========================================================
-# GET MEAL
-# =========================================================
-
 meal_df = get_meal(
-    school_code,
-    office_code,
-    ymd,
+    ymd
 )
 
+
+# =========================================================
+# NO MEAL
+# =========================================================
 
 if meal_df.empty:
 
     st.info(
-        "📭 선택한 날짜에는 급식 데이터가 없습니다."
+        "📭 급식이 없는 날입니다."
     )
 
-else:
-
-    row = meal_df.iloc[0]
+    st.stop()
 
 
-    # =====================================================
-    # MENU
-    # =====================================================
+# =========================================================
+# MEAL DATA
+# =========================================================
 
-    menu_text = clean_menu(
-        row.get(
-            "DDISH_NM",
-            "",
-        )
+meal = meal_df.iloc[0]
+
+
+raw_menu = str(
+    meal.get(
+        "DDISH_NM",
+        "",
     )
+)
 
 
-    menu_items = [
-        item.strip()
-        for item in menu_text.split("\n")
-        if item.strip()
-    ]
+# =========================================================
+# SPLIT MENU
+# =========================================================
+
+menu_list = raw_menu.split(
+    "<br/>"
+)
 
 
-    # =====================================================
-    # CALORIE
-    # =====================================================
+menu_list = [
+    menu.strip()
+    for menu in menu_list
+    if menu.strip()
+]
 
-    kcal = parse_kcal(
-        row.get(
-            "CAL_INFO",
-            "",
+
+# =========================================================
+# ALLERGY PROCESSING
+# =========================================================
+
+display_menu = []
+
+
+for menu in menu_list:
+
+    if show_allergy:
+
+        display_menu.append(
+            menu
         )
-    )
 
+    else:
 
-    # =====================================================
-    # METRICS
-    # =====================================================
-
-    col1, col2, col3 = st.columns(3)
-
-
-    with col1:
-
-        st.metric(
-            "메뉴 수",
-            len(menu_items),
-        )
-
-
-    with col2:
-
-        if kcal is not None:
-
-            st.metric(
-                "칼로리",
-                f"{kcal:,.0f} kcal",
+        display_menu.append(
+            remove_allergy_numbers(
+                menu
             )
-
-        else:
-
-            st.metric(
-                "칼로리",
-                "-",
-            )
-
-
-    with col3:
-
-        st.metric(
-            "날짜",
-            selected_date.strftime(
-                "%Y-%m-%d"
-            ),
-        )
-
-
-    # =====================================================
-    # TODAY MENU
-    # =====================================================
-
-    st.subheader(
-        "🍱 오늘의 메뉴"
-    )
-
-
-    for i, menu in enumerate(
-        menu_items,
-        start=1,
-    ):
-
-        st.markdown(
-            f"""
-            <div style="
-                background-color:#FFFFFF;
-                border:1px solid #D9D4C8;
-                border-radius:10px;
-                padding:14px 18px;
-                margin-bottom:8px;
-                color:#1F2933;
-                font-size:16px;
-            ">
-                <b style="color:#164A41;">
-                    {i}.
-                </b>
-                <span style="color:#1F2933;">
-                    {menu}
-                </span>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-
-    # =====================================================
-    # RAW DATA
-    # =====================================================
-
-    with st.expander(
-        "🔎 NEIS 원본 데이터"
-    ):
-
-        st.json(
-            row.to_dict()
         )
 
 
 # =========================================================
-# SCHOOL COMPARISON
+# CALORIE
+# =========================================================
+
+kcal = parse_kcal(
+    meal.get(
+        "CAL_INFO",
+        "",
+    )
+)
+
+
+# =========================================================
+# SCHOOL INFORMATION
+# =========================================================
+
+st.caption(
+    f"🏫 {SCHOOL_NAME} · 중식 · "
+    f"{selected_date.strftime('%Y년 %m월 %d일')}"
+)
+
+
+# =========================================================
+# BIG NUMBER CARDS
+# =========================================================
+
+st.divider()
+
+metric_col1, metric_col2 = st.columns(
+    2
+)
+
+
+with metric_col1:
+
+    st.metric(
+        "🍽️ 메뉴 가짓수",
+        f"{len(display_menu)}개",
+    )
+
+
+with metric_col2:
+
+    if kcal is not None:
+
+        st.metric(
+            "🔥 총 칼로리",
+            f"{kcal:,.1f} kcal",
+        )
+
+    else:
+
+        st.metric(
+            "🔥 총 칼로리",
+            "정보 없음",
+        )
+
+
+# =========================================================
+# MENU
 # =========================================================
 
 st.divider()
 
 st.header(
-    "🏫 학교별 급식 비교"
+    "🍚 오늘의 중식 메뉴"
 )
 
 
-comparison_options = school_options
+if display_menu:
+
+    # 메뉴를 3개씩 한 줄에 배치
+    columns_per_row = 3
+
+    for start in range(
+        0,
+        len(display_menu),
+        columns_per_row,
+    ):
+
+        row = display_menu[
+            start:start + columns_per_row
+        ]
+
+        cols = st.columns(
+            columns_per_row
+        )
+
+        for index, menu in enumerate(
+            row
+        ):
+
+            menu_number = (
+                start + index + 1
+            )
+
+            with cols[index]:
+
+                st.markdown(
+                    f"""
+                    <div style="
+                        background-color: #FFFFFF;
+                        border: 1px solid #D9D4C8;
+                        border-radius: 14px;
+                        padding: 20px;
+                        margin-bottom: 16px;
+                        min-height: 95px;
+                        box-shadow: 0 2px 8px rgba(16,42,67,0.04);
+                    ">
+
+                        <div style="
+                            color: #164A41;
+                            font-size: 14px;
+                            font-weight: 700;
+                            margin-bottom: 8px;
+                        ">
+                            MENU {menu_number}
+                        </div>
+
+                        <div style="
+                            color: #1F2933;
+                            font-size: 17px;
+                            font-weight: 600;
+                            line-height: 1.5;
+                        ">
+                            {menu}
+                        </div>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
 
-selected_comparison = st.multiselect(
-    "비교할 학교를 선택하세요.",
-    comparison_options,
-    default=(
-        comparison_options[:3]
-        if len(comparison_options) >= 3
-        else comparison_options
-    ),
+# =========================================================
+# CALORIE INFORMATION
+# =========================================================
+
+st.divider()
+
+st.subheader(
+    "🔥 칼로리 정보"
 )
 
 
-if len(selected_comparison) < 2:
+if kcal is not None:
 
-    st.info(
-        "두 개 이상의 학교를 선택하면 비교할 수 있습니다."
+    st.write(
+        f"선택한 날짜의 송탄고등학교 중식은 "
+        f"**{kcal:,.1f} kcal**입니다."
     )
 
 else:
 
-    comparison_rows = []
+    st.write(
+        "해당 날짜의 칼로리 정보가 없습니다."
+    )
 
 
-    for label in selected_comparison:
+# =========================================================
+# ORIGINAL DATA
+# =========================================================
 
-        idx = comparison_options.index(
-            label
-        )
+with st.expander(
+    "🔎 NEIS 원본 데이터 보기"
+):
 
-        school = school_df.iloc[idx]
-
-
-        comparison_meal = get_meal(
-            school["SD_SCHUL_CODE"],
-            school["ATPT_OFCDC_SC_CODE"],
-            ymd,
-        )
-
-
-        if comparison_meal.empty:
-            continue
-
-
-        comparison_row = (
-            comparison_meal.iloc[0]
-        )
-
-
-        kcal_value = parse_kcal(
-            comparison_row.get(
-                "CAL_INFO",
-                "",
-            )
-        )
-
-
-        if kcal_value is not None:
-
-            comparison_rows.append(
-                {
-                    "학교": school["SCHUL_NM"],
-                    "칼로리": kcal_value,
-                }
-            )
-
-
-    if comparison_rows:
-
-        comparison_df = pd.DataFrame(
-            comparison_rows
-        )
-
-
-        st.dataframe(
-            comparison_df,
-            use_container_width=True,
-            hide_index=True,
-        )
-
-
-        fig = px.bar(
-            comparison_df,
-            x="학교",
-            y="칼로리",
-            text="칼로리",
-            title="학교별 급식 칼로리 비교",
-        )
-
-
-        fig.update_traces(
-            marker_color="#164A41"
-        )
-
-
-        fig.update_layout(
-            paper_bgcolor="#F7F4EC",
-            plot_bgcolor="#FFFFFF",
-            font_color="#1F2933",
-            title_font_color="#102A43",
-            xaxis_title="학교",
-            yaxis_title="칼로리 (kcal)",
-        )
-
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True,
-        )
-
-    else:
-
-        st.info(
-            "비교할 학교의 급식 데이터가 없습니다."
-        )
+    st.json(
+        meal.to_dict()
+    )
 
 
 # =========================================================
@@ -895,6 +568,6 @@ else:
 st.divider()
 
 st.caption(
-    "교육부 NEIS 교육정보 개방 포털 · "
-    "우리학교 급식 데이터"
+    "교육부 NEIS 교육정보 개방 포털 "
+    "mealServiceDietInfo API · 송탄고등학교 중식"
 )
